@@ -1,8 +1,11 @@
 from Analisis.Tokens import Token
 from Analisis.Errores import Error
+from Analisis.sintactico import Sintactico
 
 Reservadas = ["Claves", "Registros"]
 Funciones_Reservadas = ["imprimir", "imprimirln", "conteo", "promedio", "contarsi", "sumar", "max", "min", "exportarReporte"]
+global Registros_Totales
+Registros_Totales = []
 
 class Analizar():
     
@@ -132,7 +135,7 @@ class Analizar():
                 
                 else:
                     
-                    Tipo = "LlaveCierra"
+                    Tipo = "LlaveCierre"
                 
                 arma_lex = Token(Tipo, char, fila, columna)
                 Lista_Tokens.append(arma_lex)
@@ -150,7 +153,7 @@ class Analizar():
                 
                 if codigo == 41:
                     
-                    Tipo = "ParentCierra"
+                    Tipo = "ParentCierre"
 
                 arma_lex = Token(Tipo, char, fila, columna)
                 Lista_Tokens.append(arma_lex)
@@ -190,6 +193,7 @@ class Analizar():
         for token in self.Lista_Tokens:
             
             print("Nombre: " + token.nombre + " Token: " + str(token.lexema))
+            
         
         for error in self.ErroresLexicos:
             
@@ -198,6 +202,7 @@ class Analizar():
     def palabra_clave(self, Archivo):
         
         lexema = ''
+        Tipo_Palabra = ""
         
         for char in Archivo:
             
@@ -209,13 +214,15 @@ class Analizar():
                     
                     if lexema == reservada:
                         
-                        return lexema, Archivo[len(lexema):], reservada
+                        Tipo_Palabra = lexema
+                        return lexema, Archivo[len(lexema):], Tipo_Palabra
         
                 for funcion in Funciones_Reservadas:
                     
                     if lexema == funcion:
                         
-                        return lexema, Archivo[len(lexema):], funcion
+                        Tipo_Palabra = "Palabra_Clave"
+                        return lexema, Archivo[len(lexema):], Tipo_Palabra
 
                 return lexema, None, None
             
@@ -437,4 +444,174 @@ class Analizar():
                 lexema += char
         
         return None, None
+'''
+    def Sintactico(self, Lista_Tokens):
+        
+        Primer_Token = True
+        global Registros_Totales
+        cont = 0
+        lexAnterior = ""
+        tipolexAnterior = ""
+        ExisteClave = False
+        Palabra_Clave_Actual = ""
+        ejecutar = True
+        
+        while Lista_Tokens:
+            
+            lexema = Lista_Tokens.pop(0)
+            
+            if lexema.nombre == "Palabra_Clave":
+                
+                if lexema.lexema == "Claves":
+                    
+                    if Primer_Token == True:
+                        
+                        Primer_Token = False
+                        ExisteClave = True
+                        lexAnterior = lexema.lexema
+                        tipolexAnterior = lexema.nombre
+                        Palabra_Clave_Actual = "Claves"
+                
+                elif lexema.lexema == "Registros":
+                    
+                    lexAnterior = lexema.lexema
+                    tipolexAnterior = lexema.nombre
+                    ExisteClave = True
+                    Palabra_Clave_Actual = "Registros"
+            
+            elif lexema.nombre == "SignIgual":
+                
+                if Primer_Token == True:
+                    
+                    arma_err = Error("Falta Claves o Registros", "Sintactico", lexema.fila, lexema.columna)
+                    self.ErroresSintacticos.append(arma_err)
+                    Primer_Token = False
+                
+                elif Primer_Token == False and tipolexAnterior == "Palabra_Clave":
+                    
+                    if lexAnterior == "Claves":
+                        
+                        lexAnterior = lexema.lexema
+                        tipolexAnterior = lexema.nombre
+                    
+                    elif lexAnterior == "Registros":
+                        
+                        lexAnterior = lexema.lexema
+                        tipolexAnterior = lexema.nombre
+                    
+                    else:
+                        
+                        arma_err = Error("Falta Claves o Registros", "Sintactico", lexema.fila, lexema.columna)
+                        self.ErroresSintacticos.append(arma_err)
+            
+            elif lexema.nombre == "CorcheteAbre":
+                
+                if Primer_Token == True:
+                    
+                    arma_err = Error(" Falta Signo Igual", "Sintactico", lexema.fila, lexema.columna)
+                    self.ErroresSintacticos.append(arma_err)
+                    Primer_Token = False
+                
+                elif Primer_Token == False and tipolexAnterior == "SignIgual":
+                    
+                    lexAnterior = lexema.lexema
+                    tipolexAnterior = lexema.nombre
+                    Claves = ""
+                    Registros = ""
+                    
+                    if Palabra_Clave_Actual == "Claves":
+                        
+                        while Lista_Tokens:
+                            
+                            lexema = Lista_Tokens.pop(0)
+                            
+                            if lexema.nombre == "CorcheteCierre":
+                            
+                                break
+                                
+                            if lexema.nombre == "String" and (tipolexAnterior == "CorcheteAbre" or tipolexAnterior == "Coma"):
+                                
+                                Claves += (lexema.lexema + "-")
+                                lexAnterior = lexema.lexema
+                                tipolexAnterior = lexema.nombre
+                            
+                            elif lexema.nombre == "String" and tipolexAnterior == "String":
+                                
+                                arma_err = Error("Falta Coma", "Sintactico", lexema.fila , lexema.columna)
+                                self.ErroresSintacticos.append(arma_err)
+                                ejecutar = False
+                            
+                            elif lexema.nombre == "Coma" and tipolexAnterior == "String":
+                                
+                                lexAnterior = lexema.lexema
+                                tipolexAnterior = lexema.nombre
+                            
+                            elif lexema.nombre == "Coma" and (tipolexAnterior == "CorcheteAbre" or tipolexAnterior == "Coma"):
+                                
+                                arma_err = Error("Falta el Campo", "Sintactico", lexema.fila , lexema.columna)
+                                self.ErroresSintacticos.append(arma_err)
+                                ejecutar = False
+                    
+                        if ejecutar == True:
+                            
+                            Claves = Claves[:-1]
+                            Claves = Claves.split("-")
+                            Registros_Totales.append(Claves[:])
+                    
+                    if Palabra_Clave_Actual == "Registros":
+                        
+                        while Lista_Tokens:
+                            
+                            lexema = Lista_Tokens.pop(0)
+                            
+                            if lexema.nombre == "CorcheteCierre":
+                            
+                                break
+                            
+                            if lexema.nombre == "LlaveAbre" and tipolexAnterior == "CorcheteAbre":
+                                
+                                lexAnterior = lexema.lexema
+                                tipolexAnterior = lexema.nombre
+                            
+                            elif lexema.nombre == "INT" or lexema.nombre == "Float" and (tipolexAnterior == "LlaveAbre" or tipolexAnterior == "Coma"):
+                                
+                                Registros += (lexema.lexema + "-")
+                                lexAnterior = lexema.lexema
+                                tipolexAnterior = lexema.nombre
+                                
+                                '''
+                                
+                                
+                            
+                            
+                            
+                            
+                        
+                        
+                        
+                            
+                            
+                            
+                            
+                        
+                            
+                            
+                        
+                        
+                        
+                        
+                        
+                    
+                    
+                        
+                        
+                
+                
+                    
+                        
+                    
+                    
+                    
+        
+        
                   

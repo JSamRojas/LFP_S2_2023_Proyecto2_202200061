@@ -5,6 +5,7 @@ import tkinter as tk
 from fileinput import filename
 from tkinter.filedialog import askopenfilename
 from Analisis.Lexico import Analizar
+from Analisis.sintactico import Sintactico
 
 ebg = '#BD0665'
 fg = '#FFFFFF'
@@ -14,14 +15,22 @@ global nombre_archivo
 global linea
 global Abrio
 global ventana
+global opciones
 nombre_archivo = ""
 Abrio = False
 ventana = tk.Tk()
+global TokensCopia
+TokensCopia = []
+global ErroresLex
+ErroresLex = []
+global ErroresSin
+ErroresSin = []
 
 def Vista():
     global TxtArchivo
     global TxtArchivoAnalizar
     global ventana
+    global opciones
     
     ventana.title("Analizador lexico y Sintactico")
     ventana.geometry("1200x700")
@@ -47,7 +56,7 @@ def Vista():
     opciones.place(x = 900, y = 10, width = 130, height = 30)
     opciones.current(0)
     
-    BtnSelec = tk.Button(ventana, text = "Seleccionar", bg = "#BD0665", fg = "white")
+    BtnSelec = tk.Button(ventana, text = "Seleccionar", bg = "#BD0665", fg = "white", command = Seleccionar_OPC)
     BtnSelec.place(x = 1060, y = 10, width = 100, height = 30)
     
     BtnAnalizar = tk.Button(ventana, text = "Analizar", bg = "#B70DEE", fg = "white", command = Analizar_DOC)
@@ -97,6 +106,9 @@ def Abrir_DOC():
 def Analizar_DOC():
     
     global Abrio
+    global TokensCopia
+    global ErroresLex
+    global ErroresSin
     
     if Abrio == False:
         
@@ -106,6 +118,11 @@ def Analizar_DOC():
         
         Analisis = Analizar(linea)
         Analisis.ObtenerTokens()
+        TokensCopia = Analisis.Lista_Tokens[:]
+        ErroresLex = Analisis.ErroresLexicos[:]
+        Analisis_Sint = Sintactico(Analisis.Lista_Tokens)
+        Analisis_Sint.Analisis_Sintactico()
+        ErroresSin = Analisis_Sint.errores_Sintacticos[:]
         
         if not len(Analisis.ErroresLexicos) == 0:
             
@@ -114,6 +131,126 @@ def Analizar_DOC():
         else:
             
             messagebox.showinfo(message = "Analisis realizado con Exito!", title = "Analizar lexico y sintactico")
+
+def Seleccionar_OPC():
+    
+    global opciones
+    TipoRepor = ""
+    global Abrio
+    
+    if opciones.get() == "Reporte de Tokens":
+
+        if Abrio == False:
+            
+            messagebox.showerror(message = "No ha cargado ningun archivo Bizdata", title = "Error")
+        
+        else:
+            
+            TipoRepor = "Tokens"
+            Reportes(TipoRepor)
+    
+    elif opciones.get() == "Reporte de Errores":
+        
+        if Abrio == False:
+            
+            messagebox.showerror(message = "No ha cargado ningun archivo Bizdata", title = "Error")
+        
+        else:
+            
+            TipoRepor = "Errores"
+            Reportes(TipoRepor)
+            
+
+def Reportes(Tipo):
+    
+    global TokensCopia
+    global ErroresLex
+    global ErroresSin
+
+    if Tipo == "Tokens":
+        
+        Repetidos = []
+        
+        with open("Tokens.html", "w") as archivo_html:
+            
+            archivo_html.write("<html>\n")
+            archivo_html.write("<head><title>Reporte de Tokens</title></head>\n")
+            archivo_html.write("<body>\n")
+            archivo_html.write("<h1>Tokens Encontrados</h1>\n")
+            archivo_html.write("<table border='1'>\n")
+            archivo_html.write("<tr><th>Tipo de Token</th><th>Nombre de Token</th><th>Fila</th><th>Columna</th></tr>\n")
+            
+            for tokens in TokensCopia:
+                
+                escribir = True
+                
+                if len(Repetidos) == 0:
+                    
+                    archivo_html.write("<tr>")
+                    archivo_html.write(f"<td>{tokens.nombre}</td>")
+                    archivo_html.write(f"<td>{tokens.lexema}</td>")
+                    archivo_html.write(f"<td>{tokens.fila}</td>")
+                    archivo_html.write(f"<td>{tokens.columna}</td>")
+                    archivo_html.write("</tr>\n")
+                    
+                    Repetidos.append(tokens)
+                
+                else:
+                    
+                    for repe in Repetidos:
+                        
+                        if repe.lexema == tokens.lexema:
+                            
+                            escribir = False
+                            break
+                    
+                    if escribir == True:
+                    
+                        archivo_html.write("<tr>")
+                        archivo_html.write(f"<td>{tokens.nombre}</td>")
+                        archivo_html.write(f"<td>{tokens.lexema}</td>")
+                        archivo_html.write(f"<td>{tokens.fila}</td>")
+                        archivo_html.write(f"<td>{tokens.columna}</td>")
+                        archivo_html.write("</tr>\n")
+                        
+                        Repetidos.append(tokens)
+                
+            archivo_html.write("</table>\n")
+            archivo_html.write("</body>\n")
+            archivo_html.write("</html>\n")
+                            
+    elif Tipo == "Errores":
+        
+        with open("Errores.html", "w") as archivo_html:
+            
+            archivo_html.write("<html>\n")
+            archivo_html.write("<head><title>Reporte de Errores</title></head>\n")
+            archivo_html.write("<body>\n")
+            archivo_html.write("<h1>Tokens Encontrados</h1>\n")
+            archivo_html.write("<table border='1'>\n")
+            archivo_html.write("<tr><th>Tipo de Error</th><th>Descripcion</th><th>Fila</th><th>Columna</th></tr>\n")
+            
+            for errlex in ErroresLex:
+                
+                archivo_html.write("<tr>")
+                archivo_html.write(f"<td>{errlex.tipoError}</td>")
+                archivo_html.write(f"<td>{errlex.lexema}</td>")
+                archivo_html.write(f"<td>{errlex.fila}</td>")
+                archivo_html.write(f"<td>{errlex.columna}</td>")
+                archivo_html.write("</tr>\n")
+            
+            for errsin in ErroresSin:
+                
+                archivo_html.write("<tr>")
+                archivo_html.write(f"<td>{errsin.tipoError}</td>")
+                archivo_html.write(f"<td>{errsin.lexema}</td>")
+                archivo_html.write(f"<td>{errsin.fila}</td>")
+                archivo_html.write(f"<td>{errsin.columna}</td>")
+                archivo_html.write("</tr>\n")
+            
+            archivo_html.write("</table>\n")
+            archivo_html.write("</body>\n")
+            archivo_html.write("</html>\n")
         
 Vista()
     
