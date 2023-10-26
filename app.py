@@ -100,6 +100,7 @@ def Abrir_DOC():
         messagebox.showerror(message = "No selecciono ningun archivo", title = "Error")
         return
     
+    TxtArchivo.delete(1.0, tk.END)
     TxtArchivo.insert(1.0,linea)
     Abrio = True
 
@@ -123,6 +124,16 @@ def Analizar_DOC():
         Analisis_Sint = Sintactico(Analisis.Lista_Tokens)
         Analisis_Sint.Analisis_Sintactico()
         ErroresSin = Analisis_Sint.errores_Sintacticos[:]
+        Producciones = Analisis_Sint.listaProducciones[:]
+        TxtArchivoAnalizar.config(state = "normal")
+        
+        i = 1
+        while Producciones:
+            
+            TxtArchivoAnalizar.insert(float(i), Producciones[0] + "\n")
+            Producciones.pop(0)
+            i + 1
+            
         
         if not len(Analisis.ErroresLexicos) == 0:
             
@@ -226,7 +237,7 @@ def Reportes(Tipo):
             archivo_html.write("<html>\n")
             archivo_html.write("<head><title>Reporte de Errores</title></head>\n")
             archivo_html.write("<body>\n")
-            archivo_html.write("<h1>Tokens Encontrados</h1>\n")
+            archivo_html.write("<h1>Errores Encontrados</h1>\n")
             archivo_html.write("<table border='1'>\n")
             archivo_html.write("<tr><th>Tipo de Error</th><th>Descripcion</th><th>Fila</th><th>Columna</th></tr>\n")
             

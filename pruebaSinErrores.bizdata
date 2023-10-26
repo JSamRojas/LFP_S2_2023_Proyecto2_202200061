@@ -17,16 +17,17 @@ Registros = [
 comentario multilinea
 '''
 
-imprimir("Reporte de");
-imprimir("Abarroteria");
-imprimirln("Reporte de");
-imprimirln("Abarroteria");
-conteo();
-promedio("stock");
-contarsi("stock", 0);
-contarsi("stock", 1);
-contarsi("stock", 2);
-sumar("stock");
+#imprimir("Reporte de");
+#imprimir("Abarroteria");
+#imprimirln("Reporte de");
+#imprimirln("Abarroteria");
+#conteo();
+#promedio("stock");
+#contarsi("precio_compra", 0);
+#contarsi("stock", 1);
+#contarsi("stock", 8);
+datos();
+#sumar("stock");
 max("precio_venta");
 min("precio_compra");
 

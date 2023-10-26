@@ -3,7 +3,7 @@ from Analisis.Errores import Error
 from Analisis.sintactico import Sintactico
 
 Reservadas = ["Claves", "Registros"]
-Funciones_Reservadas = ["imprimir", "imprimirln", "conteo", "promedio", "contarsi", "sumar", "max", "min", "exportarReporte"]
+Funciones_Reservadas = ["imprimir", "imprimirln", "conteo", "promedio", "contarsi","datos", "sumar", "max", "min", "exportarReporte"]
 global Registros_Totales
 Registros_Totales = []
 
