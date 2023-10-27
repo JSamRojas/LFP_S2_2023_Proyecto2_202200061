@@ -67,11 +67,11 @@ def Vista():
     
     TxtArchivo = Text(ventana)
     TxtArchivo.config(font = ("Consolas", 10), padx = 10, pady = 10)
-    TxtArchivo.place(x = 100, y = 100, width = 500, height = 550)
+    TxtArchivo.place(x = 50, y = 100, width = 500, height = 550)
     
     TxtArchivoAnalizar = Text(ventana)
     TxtArchivoAnalizar.config(font = ("Consolas", 10), padx = 10, pady = 10, state = "disabled")
-    TxtArchivoAnalizar.place(x = 750, y = 100, width = 350, height = 550)
+    TxtArchivoAnalizar.place(x = 650, y = 100, width = 450, height = 550)
     
     ventana.mainloop()
 
@@ -110,6 +110,7 @@ def Analizar_DOC():
     global TokensCopia
     global ErroresLex
     global ErroresSin
+    global TxtArchivoAnalizar
     
     if Abrio == False:
         
@@ -128,17 +129,22 @@ def Analizar_DOC():
         TxtArchivoAnalizar.config(state = "normal")
         
         i = 1
+        TxtArchivoAnalizar.delete(1.0, tk.END)
         while Producciones:
             
             TxtArchivoAnalizar.insert(float(i), Producciones[0] + "\n")
             Producciones.pop(0)
-            i + 1
+            i += 1
             
-        
-        if not len(Analisis.ErroresLexicos) == 0:
-            
-            messagebox.showwarning(message = "Errores detectados", title = "Warning")
-        
+        if len(Analisis.ErroresLexicos) != 0 and len(ErroresSin) != 0:
+            messagebox.showwarning(message = "Errores lexicos y sintacticos detectados", title = "Warning")
+            messagebox.showinfo(message = "Analisis realizado con Exito!", title = "Analizar lexico y sintactico")
+        elif len(Analisis.ErroresLexicos) != 0:
+            messagebox.showwarning(message = "Errores lexicos detectados", title = "Warning")
+            messagebox.showinfo(message = "Analisis realizado con Exito!", title = "Analizar lexico y sintactico")
+        elif len(ErroresSin) != 0:
+            messagebox.showwarning(message = "Errores lexicos detectados", title = "Warning")
+            messagebox.showinfo(message = "Analisis realizado con Exito!", title = "Analizar lexico y sintactico")
         else:
             
             messagebox.showinfo(message = "Analisis realizado con Exito!", title = "Analizar lexico y sintactico")

@@ -56,27 +56,27 @@ class Sintactico():
 
                         else:
                             err_Principal = True
-                            self.agregar_Error(self.tokens[0], "Sintactico")
+                            self.agregar_Error(self.tokens[0], "Falta el campo")
                             self.recuperarDos("Registros", "Palabra_Clave")
 
                     else:
                         err_Principal = True
-                        self.agregar_Error(self.tokens[0], "Sintactico")
+                        self.agregar_Error(self.tokens[0], "Falta el Corchete de Cierre")
                         self.recuperar("CorcheteCierre")
 
                 else:
                     err_Principal = True
-                    self.agregar_Error(self.tokens[0], "Sintactico")
+                    self.agregar_Error(self.tokens[0], "Falta el Corchete de Apertura")
                     self.recuperar("CorcheteCierre")
 
             else:
                 err_Principal = True
-                self.agregar_Error(self.tokens[0], "Sintactico")
+                self.agregar_Error(self.tokens[0], "Falta Signo Igual")
                 self.recuperar("CorcheteCierre")
 
         else:
             err_Principal = True
-            self.agregar_Error(self.tokens[0], "Sintactico")
+            self.agregar_Error(self.tokens[0], "Falta Palabra Clave")
             self.recuperar("CorcheteCierre")
 
     def agregar_Error(self, token, descripcion):
@@ -101,8 +101,9 @@ class Sintactico():
 
             else:
                 err_Principal = True
-                self.agregar_Error(self.tokens[0], "Sintactico")
+                self.agregar_Error(self.tokens[0], "Falta el campo")
                 self.recuperarDos("CorcheteCierre", "Registros")
+        
 
     def registros(self):
         global err_Principal
@@ -131,17 +132,17 @@ class Sintactico():
 
                 else:
                     err_Principal = True
-                    self.agregar_Error(self.tokens[0], "Sintactico")
+                    self.agregar_Error(self.tokens[0], "Falta el Corchete de Apertura")
                     self.recuperarDos("CorcheteCierre", "Palabra_Clave")
 
             else:
                 err_Principal = True
-                self.agregar_Error(self.tokens[0], "Sintactico")
+                self.agregar_Error(self.tokens[0], "Falta el Signo Igual")
                 self.recuperarDos("CorcheteCierre", "Palabra_Clave")
 
         else:
             err_Principal = True
-            self.agregar_Error(self.tokens[0], "Sintactico")
+            self.agregar_Error(self.tokens[0], "Falta Palabra Clave")
             self.recuperarDos("Registros", "Palabra_Clave")
 
     def registro(self):
@@ -164,12 +165,12 @@ class Sintactico():
 
                 else:
                     err_Principal = True
-                    self.agregar_Error(self.tokens[0], "Sintactico")
+                    self.agregar_Error(self.tokens[0], "Falta la llave de Cierre")
                     self.recuperarDos("CorcheteCierre", "Palabra_Clave")
 
         else:
 
-            self.agregar_Error(self.tokens[0], "Sintactico")
+            self.agregar_Error(self.tokens[0], "Falta la llave de Apertura")
             self.recuperar("Palabra_Clave")
 
     def valor(self):
@@ -219,16 +220,16 @@ class Sintactico():
                         self.tokens.pop(0)
                         self.operarFuncion(tipo, parametros)
                     else:
-                        self.agregar_Error(self.tokens[0], "Sintactico")
+                        self.agregar_Error(self.tokens[0], "Falta el punto y Coma")
                         self.recuperar("Palabra_Clave")
                 else:
-                    self.agregar_Error(self.tokens[0], "Sintactico")
+                    self.agregar_Error(self.tokens[0], "Falta el parentesis de Cierre")
                     self.recuperar("Palabra_Clave")
             else:
-                self.agregar_Error(self.tokens[0], "Sintactico")
+                self.agregar_Error(self.tokens[0], "Falta el parentesis de Apertura")
                 self.recuperar("Palabra_Clave")
         else:
-            self.agregar_Error(self.tokens[0], "Sintactico")
+            self.agregar_Error(self.tokens[0], "Falta el nombre de la Funcion")
             self.recuperar("Palabra_Clave")
 
     def parametros(self):
@@ -249,43 +250,34 @@ class Sintactico():
                 self.otroParametro(parametros)
 
     def otraFuncion(self):
+        global lex_a_imprimir
         if self.tokens[0].nombre != 'EOF':
             self.funcion()
             self.otraFuncion()
         else:
-            
             if not lex_a_imprimir == "":
-                
                 print(lex_a_imprimir)
-            
-            print("Analisis terminado")
+                self.listaProducciones.append(lex_a_imprimir)
+          #  print("Analisis terminado")
 
     def operarFuncion(self, tipo, parametros):
-        
         global lex_a_imprimir
-        
         if tipo.lexema == 'imprimir':
             if len(parametros) == 1:
-                
                 if lex_a_imprimir == "":
-                    
                     lex_a_imprimir += parametros[0].lexema
-                
                 else:
-                    
                     lex_a_imprimir += " "
                     lex_a_imprimir += parametros[0].lexema
             else:
-                print("error: demasiados parámetros en función imprimir")
+                self.agregar_Error(parametros[0], "Cantidad de campos invalida para la Funcion imprimir")
                 
         elif tipo.lexema == 'imprimirln':
-            
             if len(parametros) == 1:
                 print(parametros[0].lexema)
                 self.listaProducciones.append(parametros[0].lexema)
             else:
-                print("error: demasiados parametros en la funcion imprimirln")
-            
+                self.agregar_Error(parametros[0], "Cantidad de campos invalida para la Funcion imprimirln")
         if err_Principal == True:
             return
 
@@ -294,16 +286,16 @@ class Sintactico():
                 print(len(self.listaRegistros))
                 self.listaProducciones.append(str(len(self.listaRegistros)))
             else:
-                print("error: demasiados parámetros en función conteo")
+                self.agregar_Error(parametros[0], "Cantidad de campos invalida para la Funcion conteo")
 
         elif tipo.lexema == 'promedio':
             if len(parametros) == 1:
                 if parametros[0].nombre == 'String':
                     self.promedio(parametros[0].lexema, parametros[0])
                 else:
-                    print("error: se esperaba una cadena como parámetro en función promedio")
+                    self.agregar_Error(parametros[0], "Campo invalido para la funcion promedio")
             else:
-                print("error: demasiados parámetros en función promedio")
+                self.agregar_Error(parametros[0], "Cantidad de campos invalida para la Funcion promedio")
         
         elif tipo.lexema == 'contarsi':
             if len(parametros) == 2:
@@ -311,16 +303,16 @@ class Sintactico():
                     self.contarsi(parametros[0].lexema, parametros[1].lexema, parametros)
             else: 
                 if len(parametros) > 2:
-                    print("error: parametro invalido")
-                    self.agregar_Error(parametros[0], "Muchos parametros para la funcion")
+                   # print("error: parametro invalido")
+                    self.agregar_Error(parametros[0], "Muchos parametros para la funcion contarsi")
                 elif len(parametros) < 2:
-                    print("error: pocos parametros para la funcion")
-                    self.agregar_Error(parametros[0], "Faltan parametros para la funcion")
+                 #   print("error: pocos parametros para la funcion")
+                    self.agregar_Error(parametros[0], "Faltan parametros para la funcion contarsi")
         
         elif tipo.lexema == 'datos':
             if len(parametros) > 0:
-                print("error: esta funcion no debe tener parametros")
-                self.agregar_Error(parametros[0], "Muchos parametros para la funcion")
+              #  print("error: esta funcion no debe tener parametros")
+                self.agregar_Error(parametros[0], "Cantidad de campos invalida para la Funcion datos")
             else:
                 self.datos()
                 
@@ -329,44 +321,44 @@ class Sintactico():
                 if parametros[0].nombre == 'String':
                     self.sumar(parametros[0].lexema, parametros[0])
                 else:
-                    print("error: parametro invalido")
-                    self.agregar_Error(parametros[0], "Parametro Invalido")
+                  #  print("error: parametro invalido")
+                    self.agregar_Error(parametros[0], "Campo invalido para la funcion sumar")
             else:
-                print("error: Muchos parametros")
-                self.agregar_Error(parametros[0], "Muchos parametros")
+               # print("error: Muchos parametros")
+                self.agregar_Error(parametros[0], "Cantidad de campos invalida para la Funcion sumar")
         
         elif tipo.lexema == 'min':
             if len(parametros) == 1:
                 if parametros[0].nombre == 'String':
                     self.min(parametros[0].lexema, parametros[0])
                 else:
-                    print("error: parametro invalido")
-                    self.agregar_Error(parametros[0], "Parametro Invalido")
+                  #  print("error: parametro invalido")
+                    self.agregar_Error(parametros[0], "Campo invalido para la funcion min")
             else:
-                print("error: parametro invalido")
-                self.agregar_Error(parametros[0], "Muchos parametros para esta funcion")
+              #  print("error: parametro invalido")
+                self.agregar_Error(parametros[0], "Cantidad de campos invalida para la Funcion min")
         
         elif tipo.lexema == 'max':
             if len(parametros) == 1:
                 if parametros[0].nombre == 'String':
                     self.max(parametros[0].lexema, parametros[0])
                 else:
-                    print("error: parametro invalido")
-                    self.agregar_Error(parametros[0], "Parametro Invalido")
+                   # print("error: parametro invalido")
+                    self.agregar_Error(parametros[0], "Campo invalido para la funcion max")
             else:
-                print("error: parametro invalido")
-                self.agregar_Error(parametros[0], "Muchos parametros para esta funcion")
+               # print("error: parametro invalido")
+                self.agregar_Error(parametros[0], "Cantidad de campos invalida para la Funcion max")
         
         elif tipo.lexema == 'exportarReporte':
             if len(parametros) == 1:
                 if parametros[0].nombre == 'String':
                     self.exportarReporte(parametros[0].lexema)
                 else:
-                    print("error: parametro invalido")
-                    self.agregar_Error(parametros[0], "Parametro Invalido")
+                   # print("error: parametro invalido")
+                    self.agregar_Error(parametros[0], "Campo invalido para la funcion exportarReporte")
             else:
-                print("error: parametro invalido")
-                self.agregar_Error(parametros[0], "Muchos parametros para esta funcion")
+              # print("error: parametro invalido")
+                self.agregar_Error(parametros[0], "Cantidad de campos invalida para la Funcion exportarReporte")
                      
     def promedio(self, campo, parametro):
         encontrado = False
@@ -381,8 +373,8 @@ class Sintactico():
             promedio = 0
             for registro in self.listaRegistros:
                 if isinstance(registro[posicion], str):
-                    print("error: parametro invalido")
-                    self.agregar_Error(parametro, "Parametro Invalido")
+                   # print("error: parametro invalido")
+                    self.agregar_Error(parametro, "Campo invalido para la funcion promedio")
                     return
                 else:
                     suma += registro[posicion]
@@ -404,8 +396,8 @@ class Sintactico():
             if isinstance(campo2, int):  
                 for registro in self.listaRegistros:
                     if isinstance(registro[posicion], str):
-                        print("Error: parametro invalido")
-                        self.agregar_Error(parametro[1], "Parametro Invalido")
+                       # print("Error: parametro invalido")
+                        self.agregar_Error(parametro[1], "Campo invalido para la funcion contarsi")
                     else:
                         ListaNumeros = registro[posicion]
                         ListaNumeros = str(ListaNumeros)
@@ -416,18 +408,18 @@ class Sintactico():
                 print(contador)
                 self.listaProducciones.append(str(contador))   
             else:
-                print("Error: parametro invalido")
-                self.agregar_Error(parametro[1], "Parametro Invalido")
+               # print("Error: parametro invalido")
+                self.agregar_Error(parametro[1], "Campo invalido para la funcion contarsi")
         
     def datos(self):
         claves = ""
         registros = ""
         for clave in self.listaClaves:
-            claves += clave + "\t"
+            claves += clave + "\t\t"
     
         claves = ">>> " + claves
         print(claves)
-        self.listaProducciones.append(">>> " + claves)
+        self.listaProducciones.append(claves)
         
         for registro in self.listaRegistros:
             registros = ""
@@ -449,8 +441,8 @@ class Sintactico():
             suma = 0
             for registro in self.listaRegistros:
                 if isinstance(registro[posicion], str):
-                    print("error: parametro invalido")
-                    self.agregar_Error(parametro, "Parametro Invalido")
+                   # print("error: parametro invalido")
+                    self.agregar_Error(parametro, "Campo invalido para la funcion sumar")
                     return
                 else:
                     suma += registro[posicion]
@@ -470,8 +462,8 @@ class Sintactico():
                 minimo = 0
                 for registro in self.listaRegistros:
                     if isinstance(registro[posicion], str):
-                        print("error: parametro invalido")
-                        self.agregar_Error(parametro, "Parametro Invalido")
+                       # print("error: parametro invalido")
+                        self.agregar_Error(parametro, "Campo invalido para la funcion min")
                         return
                     else:
                         Listavalores.append(registro[posicion])
@@ -492,8 +484,8 @@ class Sintactico():
                 maximo = 0
                 for registro in self.listaRegistros:
                     if isinstance(registro[posicion], str):
-                        print("error: parametro invalido")
-                        self.agregar_Error(parametro, "Parametro Invalido")
+                        #print("error: parametro invalido")
+                        self.agregar_Error(parametro, "Campo invalido para la funcion max")
                         return
                     else:
                         Listavalores.append(registro[posicion])
