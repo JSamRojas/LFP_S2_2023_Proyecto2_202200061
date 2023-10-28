@@ -78,39 +78,7 @@ Dentro de la clase **Sintactico()** tenemos 3 funciones principales, las cuales 
 
 Para realizar el Analizador Sintactico, se utilizo una gramatica libre de contexto o independiente del contexto, la cual fue la siguiente:
 
-<Claves> siendo las Claves
-<Registros> siendo los Registros
-<Funciones> siendo las funciones como imprimir, imprimirln, conteo, promedio, contarsi...
-
-**Terminales**:
-Claves, Registros, Palabra_Clave, SignIgual, CorcheteAbre ,String, Coma,
-CorcheteCierre, LLaveAbre, INT, Float, LLaveCierre, ParentAbre,
-ParentCierre, PuntoyComa
-    
-**No Terminale**s:
-<Inicio>, <Claves> <Registros>, <Funciones>, <otra_Clave>, <Registro>,
-<otro_Registro>, <Valor>, <otro_Valor>, <Funcion>, <otra_Funcion>,
-<Parametros>, <otra_Parametro>
-
-**Inicio**: <Inicio>
-
-**Producciones**: 
-<Inicio> ::= <Claves> <Registros> <Funciones>
-<Claves> ::= Claves SignIgual CorcheteAbre String <otra_Clave> CorcheteCierre
-<otra_Clave> ::= Coma String <otra_Clave> | ε
----
-<Registros> ::= Registros SignIgual CorcheteAbre <Registro> <otro_Registro> CorcheteCierre
-<Registro> ::= LlaveAbre <Valor> <otro_Valor> LlaveCierre
-<Valor> ::= String | INT | Float
-<otro_Valor> ::= Coma <Valor> <otro_Valor> | ε
-<otro_Registro> ::= <Registro> <otro_Registro> | ε
----
-<Funciones> ::= <Funcion> <otra_Funcion>
-<otra_Funcion> ::= <Funcion> <otra_Funcion>| ε
-<Funcion> ::= Palabra_Clave ParentAbre <Parametros> ParentCierra PuntoyComa
-<Parametros> ::= <Valor> <otro_Parametro> | ε
-<Valor> ::= String | INT | Float
-<otro_Parametro> ::= Coma <Valor> <otro_Parametro> | ε
+![Manual Técnico](https://i.ibb.co/Yhw7ddZ/Gramatica.png)
 
 ### Reporte de Tokens
 
