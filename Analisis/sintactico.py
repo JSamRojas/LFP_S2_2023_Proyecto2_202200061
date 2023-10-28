@@ -104,7 +104,6 @@ class Sintactico():
                 self.agregar_Error(self.tokens[0], "Falta el campo")
                 self.recuperarDos("CorcheteCierre", "Registros")
         
-
     def registros(self):
         global err_Principal
         if self.tokens[0].nombre == "Registros":

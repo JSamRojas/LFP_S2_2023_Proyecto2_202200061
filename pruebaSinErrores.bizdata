@@ -9,7 +9,7 @@ Registros = [
     {3, "Mayonesa", 15.00, 18.00, 8}
     {4, "Mostaza", 14.00, 16.00, 4}
 ]
-??
+
 # Comentarios de una sola linea y que puede ser cualquier cosa
 
 '''
@@ -31,4 +31,4 @@ sumar("stock");
 max("precio_venta");
 min("precio_compra");
 
-exportarReporte("Reporte HTMl de abarroteria");
+exportarReporte("Reporte HTML de abarroteria");

@@ -1,5 +1,5 @@
 # Lenguajes Formales y de Programacion
-## Proyecto No.1
+## Proyecto No.2
 ### Segundo Semestre
 ```js
 Universidad San Carlos de Guatemala

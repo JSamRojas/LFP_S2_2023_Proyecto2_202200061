@@ -82,6 +82,7 @@ def Abrir_DOC():
     global TxtArchivo
     global Abrio
     global ventana
+    global TxtArchivoAnalizar
     
     linea = ""
             
@@ -102,6 +103,7 @@ def Abrir_DOC():
     
     TxtArchivo.delete(1.0, tk.END)
     TxtArchivo.insert(1.0,linea)
+    TxtArchivoAnalizar.delete(1.0, tk.END)
     Abrio = True
 
 def Analizar_DOC():
@@ -186,9 +188,7 @@ def Reportes(Tipo):
 
     if Tipo == "Tokens":
         
-        Repetidos = []
-        
-        with open("Tokens.html", "w") as archivo_html:
+        with open("Reporte de Tokens.html", "w") as archivo_html:
             
             archivo_html.write("<html>\n")
             archivo_html.write("<head><title>Reporte de Tokens</title></head>\n")
@@ -199,38 +199,12 @@ def Reportes(Tipo):
             
             for tokens in TokensCopia:
                 
-                escribir = True
-                
-                if len(Repetidos) == 0:
-                    
-                    archivo_html.write("<tr>")
-                    archivo_html.write(f"<td>{tokens.nombre}</td>")
-                    archivo_html.write(f"<td>{tokens.lexema}</td>")
-                    archivo_html.write(f"<td>{tokens.fila}</td>")
-                    archivo_html.write(f"<td>{tokens.columna}</td>")
-                    archivo_html.write("</tr>\n")
-                    
-                    Repetidos.append(tokens)
-                
-                else:
-                    
-                    for repe in Repetidos:
-                        
-                        if repe.lexema == tokens.lexema:
-                            
-                            escribir = False
-                            break
-                    
-                    if escribir == True:
-                    
-                        archivo_html.write("<tr>")
-                        archivo_html.write(f"<td>{tokens.nombre}</td>")
-                        archivo_html.write(f"<td>{tokens.lexema}</td>")
-                        archivo_html.write(f"<td>{tokens.fila}</td>")
-                        archivo_html.write(f"<td>{tokens.columna}</td>")
-                        archivo_html.write("</tr>\n")
-                        
-                        Repetidos.append(tokens)
+                archivo_html.write("<tr>")
+                archivo_html.write(f"<td>{tokens.nombre}</td>")
+                archivo_html.write(f"<td>{tokens.lexema}</td>")
+                archivo_html.write(f"<td>{tokens.fila}</td>")
+                archivo_html.write(f"<td>{tokens.columna}</td>")
+                archivo_html.write("</tr>\n")
                 
             archivo_html.write("</table>\n")
             archivo_html.write("</body>\n")
